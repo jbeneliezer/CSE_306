@@ -36,6 +36,7 @@ idtinit(void)
 void
 trap(struct trapframe *tf)
 {
+  if(tf->trapno != T_IRQ0+IRQ_TIMER) cprintf("interrupt: %d\n", tf->trapno);
   if(tf->trapno == T_SYSCALL){
     if(myproc()->killed)
       exit();
@@ -72,6 +73,9 @@ trap(struct trapframe *tf)
     lapiceoi();
     break;
   case T_IRQ0 + 7:
+  case T_IRQ0 + IRQ_MOUSE:
+    mouseintr();
+    break;
   case T_IRQ0 + IRQ_SPURIOUS:
   case T_IRQ0 + IRQ_SPURIOUS1:
     cprintf("cpu%d: spurious interrupt (%d) at %x:%x\n",

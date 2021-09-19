@@ -10,12 +10,10 @@ kbdgetc(void)
   static uchar *charcode[4] = {
     normalmap, shiftmap, ctlmap, ctlmap
   };
-  uint st, data, c;
+  uint data, c;
 
-  st = inb(KBSTATP);
-  if((st & KBS_DIB) == 0)
-    return -1;
-  data = inb(KBDATAP);
+  data = *buffer_out;
+  buffer_out = (buffer_out == (BUFFER + 1023)) ? BUFFER: buffer_out + 1;
 
   if(data == 0xE0){
     shift |= E0ESC;
@@ -46,5 +44,17 @@ kbdgetc(void)
 void
 kbdintr(void)
 {
+  uchar st;
+
+  st = inb(KBSTATP);
+  if((st & KBS_DIB) != 0)
+  {
+    if ((st & 0x20) == 0)
+    {
+      *buffer_in = inb(KBDATAP);
+      buffer_in = (buffer_in == (BUFFER + 1023)) ? BUFFER: buffer_in + 1;
+    }
+  }
+
   consoleintr(kbdgetc);
 }
