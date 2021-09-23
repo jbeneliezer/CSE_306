@@ -38,18 +38,19 @@ kbdgetc(void)
     else if('A' <= c && c <= 'Z')
       c += 'a' - 'A';
   }
+  cprintf("%d\t", c);
   return c;
 }
 
 void
 kbdintr(void)
 {
-  uchar st;
+  uchar status;
 
-  st = inb(KBSTATP);
-  if((st & KBS_DIB) != 0)
+  status = inb(KBSTATP);
+  if((status & KBS_DIB) != 0)
   {
-    if ((st & 0x20) == 0)
+    if ((status & 0x20) == 0)
     {
       *buffer_in = inb(KBDATAP);
       buffer_in = (buffer_in == (BUFFER + 1023)) ? BUFFER: buffer_in + 1;

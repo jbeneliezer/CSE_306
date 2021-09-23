@@ -36,7 +36,7 @@ idtinit(void)
 void
 trap(struct trapframe *tf)
 {
-  if(tf->trapno != T_IRQ0+IRQ_TIMER) cprintf("interrupt: %d\n", tf->trapno);
+  if((tf->trapno != T_IRQ0+IRQ_TIMER) && (tf->trapno != T_IRQ0+IRQ_COM1) && (tf->trapno != T_SYSCALL)) cprintf("interrupt: %d\n", tf->trapno);
   if(tf->trapno == T_SYSCALL){
     if(myproc()->killed)
       exit();

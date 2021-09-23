@@ -7,8 +7,9 @@ void
 mouseinit(void)
 {
     uchar status;
-    // uchar data[3];
 
+    status = inb(0x64);
+    while (status & 1);
     outb(0x64, 0x20);
     status = inb(0x60);
 
@@ -24,20 +25,20 @@ mouseinit(void)
 
     status = inb(0x60);
     if (status != 0xFA) cprintf("Error");
-    // while(1)
-    // {
-    //     uchar i = 0;
-    //     while (i < 3)
-    //     {
-    //         data[i++] = inb(0x60);
-    //     }
-    //     cprintf("mouse -- %d %d %d", data[0], data[1], data[2]);
-    // }
 
 }
 
 void
 mouseintr(void)
 {
-
+    uchar data[3];
+    while(1)
+    {
+        uchar i = 0;
+        while (i < 3)
+        {
+            data[i++] = inb(0x60);
+        }
+        cprintf("mouse -- %d %d %d", data[0], data[1], data[2]);
+    }
 }
