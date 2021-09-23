@@ -8,37 +8,41 @@ mouseinit(void)
 {
     uchar status;
 
-    status = inb(0x64);
+    status = inb(MSTATP);
     while (status & 1);
-    outb(0x64, 0x20);
-    status = inb(0x60);
+    outb(MSTATP, 0x20);
+    status = inb(MDATAP);
 
-    cprintf("status: %d\n", status);
     status = ((status | 0x02) & 0xDF);
-    cprintf("status: %d\n", status);
 
-    outb(0x64, 0x60);
-    outb(0x60, status);
+    outb(MSTATP, 0x60);         // set status, enable IRQ12
+    outb(MDATAP, status);
 
-    outb(0x64, 0xD4);
-    outb(0x60, 0xF4);
+    outb(MSTATP, 0xA8);         // enable auxiliary device
+    while (inb(MDATAP) == 0xFA);
 
-    status = inb(0x60);
-    if (status != 0xFA) cprintf("Error");
+    outb(MSTATP, 0xD4);
+    outb(MDATAP, 0xF4);
+
+    status = inb(MDATAP);
+    while (inb(MDATAP) == 0xFA);
 
 }
 
 void
 mouseintr(void)
 {
-    uchar data[3];
-    while(1)
+    mbuffer_in = MBUFFER;
+    mbuffer_out = MBUFFER;
+    mbuffer_end = MBUFFER[255];
+
+    if (inb(MSTATP) & 1)
     {
         uchar i = 0;
         while (i < 3)
         {
-            data[i++] = inb(0x60);
+            *mbuffer_in[i++] = inb(MDATAP);
+            mbuffer_in = (mbuffer_in == mbuffer_end) ? MBUFFER: mbuffer_in + (1*sizeof(uchar*));
         }
-        cprintf("mouse -- %d %d %d", data[0], data[1], data[2]);
     }
 }

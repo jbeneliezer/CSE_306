@@ -110,7 +110,8 @@ static uchar ctlmap[256] =
   [0xD2] KEY_INS,   [0xD3] KEY_DEL
 };
 
-uchar BUFFER[1024];
-uchar* buffer_in = BUFFER;
-uchar* buffer_out = BUFFER;
+uchar BUFFER[256];
+uchar* buffer_in;
+uchar* buffer_out;
+uchar* buffer_end;
 

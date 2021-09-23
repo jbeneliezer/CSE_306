@@ -24,7 +24,7 @@ main(void)
   seginit();       // segment descriptors
   picinit();       // disable pic
   ioapicinit();    // another interrupt controller
-  //mouseinit();     // mouse
+  mouseinit();     // mouse
   consoleinit();   // console hardware
   uartinit();      // serial port
   pinit();         // process table

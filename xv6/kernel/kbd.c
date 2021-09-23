@@ -12,8 +12,11 @@ kbdgetc(void)
   };
   uint data, c;
 
+  if (buffer_out >= buffer_in) return -1;
+
   data = *buffer_out;
-  buffer_out = (buffer_out == (BUFFER + 1023)) ? BUFFER: buffer_out + 1;
+  if (buffer_out == buffer_end) buffer_out = BUFFER;
+  else ++buffer_out;
 
   if(data == 0xE0){
     shift |= E0ESC;
@@ -38,7 +41,6 @@ kbdgetc(void)
     else if('A' <= c && c <= 'Z')
       c += 'a' - 'A';
   }
-  cprintf("%d\t", c);
   return c;
 }
 
@@ -46,6 +48,9 @@ void
 kbdintr(void)
 {
   uchar status;
+  buffer_in = BUFFER;
+  buffer_out = BUFFER;
+  buffer_end = BUFFER + 255;
 
   status = inb(KBSTATP);
   if((status & KBS_DIB) != 0)
@@ -53,7 +58,7 @@ kbdintr(void)
     if ((status & 0x20) == 0)
     {
       *buffer_in = inb(KBDATAP);
-      buffer_in = (buffer_in == (BUFFER + 1023)) ? BUFFER: buffer_in + 1;
+      buffer_in = (buffer_in == buffer_end)  ? BUFFER: buffer_in + 1;
     }
   }
 
