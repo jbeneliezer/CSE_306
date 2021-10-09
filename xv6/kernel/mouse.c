@@ -34,15 +34,17 @@ mouseintr(void)
 {
     mbuffer_in = MBUFFER;
     mbuffer_out = MBUFFER;
-    mbuffer_end = MBUFFER[255];
+    mbuffer_end = &MBUFFER[255];
 
     if (inb(MSTATP) & 1)
     {
-        uchar i = 0;
+        uint i = 0;
         while (i < 3)
         {
             *mbuffer_in[i++] = inb(MDATAP);
-            mbuffer_in = (mbuffer_in == mbuffer_end) ? MBUFFER: mbuffer_in + (1*sizeof(uchar*));
+            if ((uint)mbuffer_in == (uint)mbuffer_end) mbuffer_in = MBUFFER;
+            else ++mbuffer_in;
+            cprintf("mouse: %d\n", mbuffer_in[i-1]);
         }
     }
 }
