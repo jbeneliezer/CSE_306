@@ -224,3 +224,14 @@ void cmostime(struct rtcdate *r)
   *r = t1;
   r->year += 2000;
 }
+
+// returns r1 - r2 time difference in seconds
+
+int timediff(struct rtcdate *r1, struct rtcdate *r2)
+{
+
+#define convert(x)  ((x->year)*31536000  + (x->month)*2629746 + (x->day)*86400 + (x->hour)*3600 + (x->minute)*60 + (x->second))
+  int t = convert(r1) - convert(r2);
+#undef convert
+  return t;
+}

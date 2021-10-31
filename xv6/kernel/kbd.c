@@ -50,7 +50,7 @@ kbdintr(void)
   uchar status;
   buffer_in = BUFFER;
   buffer_out = BUFFER;
-  buffer_end = BUFFER + 255;
+  buffer_end = BUFFER + BUF_SIZE - 1;
 
   status = inb(KBSTATP);
   if((status & KBS_DIB) != 0)

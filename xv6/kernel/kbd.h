@@ -4,6 +4,8 @@
 #define KBS_DIB         0x01    // kbd data in buffer
 #define KBDATAP         0x60    // kbd data port(I)
 
+#define BUF_SIZE        256
+
 #define NO              0
 
 #define SHIFT           (1<<0)
@@ -110,7 +112,7 @@ static uchar ctlmap[256] =
   [0xD2] KEY_INS,   [0xD3] KEY_DEL
 };
 
-uchar BUFFER[256];
+uchar BUFFER[BUF_SIZE];
 uchar* buffer_in;
 uchar* buffer_out;
 uchar* buffer_end;

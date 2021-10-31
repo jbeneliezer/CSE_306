@@ -8,6 +8,8 @@
 #include "traps.h"
 #include "spinlock.h"
 
+#define tickrate 10 // tick rate in ms
+
 // Interrupt descriptor table (shared by all CPUs).
 struct gatedesc idt[256];
 extern uint vectors[];  // in vectors.S: array of 256 entry pointers
@@ -36,7 +38,6 @@ idtinit(void)
 void
 trap(struct trapframe *tf)
 {
-  if((tf->trapno != T_IRQ0+IRQ_TIMER) && (tf->trapno != T_IRQ0+IRQ_COM1) && (tf->trapno != T_SYSCALL)) cprintf("interrupt: %d\n", tf->trapno);
   if(tf->trapno == T_SYSCALL){
     if(myproc()->killed)
       exit();
@@ -54,6 +55,22 @@ trap(struct trapframe *tf)
       ticks++;
       wakeup(&ticks);
       release(&tickslock);
+      struct proc *p;
+      struct cpu *c;
+      p->pt_cpu++;
+      acquire(&ptable.lock);
+      int i = 0;
+      for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+      {
+        p->pt_real++;
+        if (p->ticks <= 0 && p->state == SLEEPING) wakeup1(&p->chan);
+        p->ticks--;
+        if (p->state == RUNNABLE) p->pt_wait++;
+        i++;
+      }
+      double p_value = -(log(1/10))/((30 * 1000)/tickrate);
+      c->load_avg = p_value * i + (1 - p_value) * c->load_avg;
+      release(&ptable.lock);
     }
     lapiceoi();
     break;
@@ -113,4 +130,27 @@ trap(struct trapframe *tf)
   // Check if the process has been killed since we yielded
   if(myproc() && myproc()->killed && (tf->cs&3) == DPL_USER)
     exit();
+
+  // struct proc *p = myproc();
+  // struct signal *s;
+
+  // for (s = p->sigs; s <= p->sigptr; ++s)
+  // {
+  //   if (s->n == 0)
+  //   {
+  //     p->killed = 1;
+  //   }
+  //   else if (s->n == p->mask.n)
+  //   {
+  //     continue;
+  //   }
+  //   else
+  //   {
+  //     // tf->esp -= sizeof(p->tf);
+  //     // memmove((void*) tf->esp, &(p->tf), sizeof(p->tf));
+  //     // tf->esp -= sizeof(s->n);
+  //     // memmove((void*)tf->esp, &(s->n), sizeof(s->n));
+  //     s->handler(s->n);
+  //   }
+  // }
 }

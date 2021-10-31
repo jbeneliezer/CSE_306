@@ -103,29 +103,47 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+extern int sigsend(void);
+extern int sigsethandler(void);
+extern int sigreturn(void);
+extern int siggetmask(void);
+extern int sigsetmask(void);
+extern int sigpause(void);
+extern int predict_cpu(void);
+extern int sleep_ticks(void);
 
 static int (*syscalls[])(void) = {
-[SYS_fork]    sys_fork,
-[SYS_exit]    sys_exit,
-[SYS_wait]    sys_wait,
-[SYS_pipe]    sys_pipe,
-[SYS_read]    sys_read,
-[SYS_kill]    sys_kill,
-[SYS_exec]    sys_exec,
-[SYS_fstat]   sys_fstat,
-[SYS_chdir]   sys_chdir,
-[SYS_dup]     sys_dup,
-[SYS_sbrk]    sys_sbrk,
-[SYS_sleep]   sys_sleep,
-[SYS_uptime]  sys_uptime,
-[SYS_open]    sys_open,
-[SYS_write]   sys_write,
-[SYS_mknod]   sys_mknod,
-[SYS_unlink]  sys_unlink,
-[SYS_link]    sys_link,
-[SYS_mkdir]   sys_mkdir,
-[SYS_close]   sys_close,
+[SYS_fork]          sys_fork,
+[SYS_exit]          sys_exit,
+[SYS_wait]          sys_wait,
+[SYS_pipe]          sys_pipe,
+[SYS_read]          sys_read,
+[SYS_kill]          sys_kill,
+[SYS_exec]          sys_exec,
+[SYS_fstat]         sys_fstat,
+[SYS_chdir]         sys_chdir,
+[SYS_dup]           sys_dup,
+[SYS_sbrk]          sys_sbrk,
+[SYS_sleep]         sys_sleep,
+[SYS_uptime]        sys_uptime,
+[SYS_open]          sys_open,
+[SYS_write]         sys_write,
+[SYS_mknod]         sys_mknod,
+[SYS_unlink]        sys_unlink,
+[SYS_link]          sys_link,
+[SYS_mkdir]         sys_mkdir,
+[SYS_close]         sys_close,
+[SYS_sigsend]       sigsend,
+[SYS_sigsethandler] sigsethandler,
+[SYS_sigreturn]     sigreturn,
+[SYS_siggetmask]    siggetmask,
+[SYS_sigsetmask]    sigsetmask,
+[SYS_sigpause]      sigpause,
+[SYS_predict_cpu]   predict_cpu
 };
+
+
+
 
 void
 syscall(void)

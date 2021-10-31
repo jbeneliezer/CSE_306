@@ -23,7 +23,8 @@ sys_exit(void)
 int
 sys_wait(void)
 {
-  return wait();
+  struct ptimes *p;
+  return wait(p);
 }
 
 int
@@ -88,4 +89,21 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+int
+predict_cpu(void)
+{
+  int ticks;
+  if (argint(0, &ticks) < 0) return -1;
+  myproc()->ticks = ticks;
+  return 0;
+}
+
+int sleep_ticks(void)
+{
+  int ticks;
+  if (argint(0, &ticks) < 0) return -1;
+  
+
 }

@@ -1,3 +1,4 @@
+struct semaphore;
 struct buf;
 struct context;
 struct file;
@@ -80,6 +81,7 @@ void            lapiceoi(void);
 void            lapicinit(void);
 void            lapicstartap(uchar, uint);
 void            microdelay(int);
+int            timediff(struct rtcdate *r1, struct rtcdate *r2);
 
 // log.c
 void            initlog(int dev);
@@ -121,9 +123,15 @@ void            reschedule(void);
 void            setproc(struct proc*);
 void            sleep(void*, struct spinlock*);
 void            userinit(void);
-int             wait(void);
+int             wait(struct ptimes *);
 void            wakeup(void*);
 void            yield(void);
+void            kfork(void (*func)(void));
+
+// semaphore.c
+void            sem_init(struct semaphore *sp, int val);
+void            sem_P(struct semaphore *sp);
+void            sem_V(struct semaphore *sp);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

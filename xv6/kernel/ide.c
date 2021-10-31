@@ -10,6 +10,7 @@
 #include "traps.h"
 #include "spinlock.h"
 #include "sleeplock.h"
+#include "semaphore.h"
 #include "fs.h"
 #include "buf.h"
 
@@ -121,7 +122,7 @@ ideintr(void)
   // Wake process waiting for this buf.
   b->flags |= B_VALID;
   b->flags &= ~B_DIRTY;
-  wakeup(b);
+  sem_V(&b->sem);
 
   // Start disk on next buf in queue.
   if(idequeue != 0)
@@ -146,6 +147,7 @@ iderw(struct buf *b)
   if(b->dev != 0 && !havedisk1)
     panic("iderw: ide disk 1 not present");
 
+  sem_init(&b->sem, 0);
   acquire(&idelock);  //DOC:acquire-lock
 
   // Append b to idequeue.
@@ -159,10 +161,6 @@ iderw(struct buf *b)
     idestart(b);
 
   // Wait for request to finish.
-  while((b->flags & (B_VALID|B_DIRTY)) != B_VALID){
-    sleep(b, &idelock);
-  }
-
-
   release(&idelock);
+  sem_P(&b->sem);
 }
